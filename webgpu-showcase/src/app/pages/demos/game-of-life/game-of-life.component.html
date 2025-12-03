@@ -1,0 +1,74 @@
+<div class="demo-page">
+  <div class="demo-page__header">
+    <h1><span class="icon">🧬</span> Conway's Game of Life</h1>
+  </div>
+  
+  <div class="demo-page__content">
+    <div class="demo-page__canvas-area">
+      <app-demo-base 
+        #demoBase
+        (contextReady)="onContextReady($event)"
+      ></app-demo-base>
+    </div>
+    
+    <div class="demo-page__controls">
+      <p class="demo-page__description">
+        The classic cellular automaton running entirely on the GPU. Each cell's 
+        next state is computed in parallel using compute shaders.
+      </p>
+      
+      <h3>Controls</h3>
+      
+      <div class="control-group">
+        <label>Grid Size: {{ gridSize }}×{{ gridSize }}</label>
+        <input 
+          type="range" 
+          min="64" 
+          max="512" 
+          step="64" 
+          [(ngModel)]="gridSize"
+          (change)="onGridSizeChange()"
+        >
+      </div>
+      
+      <div class="control-group">
+        <label>Simulation Speed</label>
+        <input 
+          type="range" 
+          min="1" 
+          max="60" 
+          step="1" 
+          [(ngModel)]="simulationSpeed"
+        >
+      </div>
+
+      <div class="control-group">
+        <label>
+          <input type="checkbox" [(ngModel)]="paused">
+          Paused
+        </label>
+      </div>
+
+      <div class="button-group">
+        <button class="btn btn--primary" (click)="randomize()">
+          Randomize
+        </button>
+        <button class="btn btn--secondary" (click)="clear()">
+          Clear
+        </button>
+      </div>
+
+      <div class="stats-panel">
+        <div class="stats-panel__item">
+          <span class="label">Cells</span>
+          <span class="value">{{ (gridSize * gridSize).toLocaleString() }}</span>
+        </div>
+        <div class="stats-panel__item">
+          <span class="label">Generation</span>
+          <span class="value">{{ generation().toLocaleString() }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

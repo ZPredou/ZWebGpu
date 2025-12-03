@@ -8,82 +8,8 @@ import { WebGPUContext } from '../../../types/webgpu.types';
   standalone: true,
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div class="demo-base">
-      <!-- Loading State -->
-      <div class="webgpu-loading" *ngIf="loading()">
-        <div class="webgpu-loading__spinner"></div>
-        <div class="webgpu-loading__text">Initializing WebGPU...</div>
-      </div>
-
-      <!-- Error State -->
-      <div class="webgpu-error" *ngIf="error()">
-        <div class="webgpu-error__icon">⚠️</div>
-        <h3 class="webgpu-error__title">WebGPU Error</h3>
-        <p class="webgpu-error__message">{{ error() }}</p>
-      </div>
-
-      <!-- Canvas -->
-      <div class="webgpu-canvas-container" [class.hidden]="loading() || error()">
-        <canvas #canvas></canvas>
-      </div>
-
-      <!-- Stats Overlay -->
-      <div class="stats-overlay" *ngIf="showStats && !loading() && !error()">
-        <div class="stats-overlay__item">
-          <span class="label">FPS</span>
-          <span class="value">{{ fps() }}</span>
-        </div>
-        <div class="stats-overlay__item" *ngIf="customStats()">
-          <span class="label">{{ customStats()!.label }}</span>
-          <span class="value">{{ customStats()!.value }}</span>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .demo-base {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-
-    .hidden {
-      visibility: hidden;
-    }
-
-    .stats-overlay {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      display: flex;
-      gap: 12px;
-      z-index: 10;
-
-      &__item {
-        display: flex;
-        flex-direction: column;
-        padding: 8px 12px;
-        background: rgba(10, 10, 15, 0.85);
-        backdrop-filter: blur(8px);
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-
-        .label {
-          font-size: 0.65rem;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          color: var(--text-muted);
-        }
-
-        .value {
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 1rem;
-          color: var(--accent-primary);
-        }
-      }
-    }
-  `]
+  templateUrl: './demo-base.component.html',
+  styleUrl: './demo-base.component.scss'
 })
 export class DemoBaseComponent implements AfterViewInit, OnDestroy {
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>;
@@ -193,4 +119,3 @@ export class DemoBaseComponent implements AfterViewInit, OnDestroy {
     this.customStats.set({ label, value });
   }
 }
-

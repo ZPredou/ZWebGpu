@@ -1,0 +1,52 @@
+// Shared styles for demo pages
+// Import this in your demo component's SCSS file
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.shader-info,
+.pattern-info,
+.filter-info,
+.info-panel {
+  margin-top: 24px;
+  padding: 16px;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  border-left: 3px solid var(--accent-primary);
+
+  h4 {
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    color: var(--accent-primary);
+  }
+
+  p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  &.secondary {
+    border-left-color: var(--accent-secondary);
+    
+    h4 {
+      color: var(--accent-secondary);
+    }
+  }
+
+  &.tertiary {
+    border-left-color: var(--accent-tertiary);
+    
+    h4 {
+      color: var(--accent-tertiary);
+    }
+  }
+}
+
+.results {
+  margin-top: 24px;
+}
+

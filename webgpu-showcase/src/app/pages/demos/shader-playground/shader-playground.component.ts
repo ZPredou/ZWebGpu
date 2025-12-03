@@ -9,100 +9,8 @@ import { WebGPUContext } from '../../../types/webgpu.types';
   standalone: true,
   imports: [CommonModule, FormsModule, DemoBaseComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div class="demo-page">
-      <div class="demo-page__header">
-        <h1><span class="icon">✨</span> Shader Playground</h1>
-      </div>
-      
-      <div class="demo-page__content">
-        <div class="demo-page__canvas-area">
-          <app-demo-base 
-            #demoBase
-            (contextReady)="onContextReady($event)"
-          ></app-demo-base>
-        </div>
-        
-        <div class="demo-page__controls">
-          <p class="demo-page__description">
-            Interactive fragment shader playground. Select from preset effects or 
-            modify parameters in real-time.
-          </p>
-          
-          <h3>Shader Preset</h3>
-          
-          <div class="control-group">
-            <select [(ngModel)]="selectedPreset" (change)="onPresetChange()">
-              <option *ngFor="let preset of presets" [value]="preset.id">
-                {{ preset.name }}
-              </option>
-            </select>
-          </div>
-
-          <h3>Parameters</h3>
-          
-          <div class="control-group">
-            <label>Speed</label>
-            <input 
-              type="range" 
-              min="0" 
-              max="5" 
-              step="0.1" 
-              [(ngModel)]="speed"
-            >
-          </div>
-          
-          <div class="control-group">
-            <label>Intensity</label>
-            <input 
-              type="range" 
-              min="0" 
-              max="2" 
-              step="0.1" 
-              [(ngModel)]="intensity"
-            >
-          </div>
-
-          <div class="control-group">
-            <label>Color Shift</label>
-            <input 
-              type="range" 
-              min="0" 
-              max="1" 
-              step="0.05" 
-              [(ngModel)]="colorShift"
-            >
-          </div>
-
-          <div class="shader-info">
-            <h4>{{ getCurrentPreset()?.name }}</h4>
-            <p>{{ getCurrentPreset()?.description }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .shader-info {
-      margin-top: 24px;
-      padding: 16px;
-      background: var(--bg-tertiary);
-      border-radius: 8px;
-      border-left: 3px solid var(--accent-primary);
-
-      h4 {
-        font-size: 0.9rem;
-        margin-bottom: 8px;
-        color: var(--accent-primary);
-      }
-
-      p {
-        font-size: 0.85rem;
-        color: var(--text-secondary);
-        line-height: 1.5;
-      }
-    }
-  `]
+  templateUrl: './shader-playground.component.html',
+  styleUrl: './shader-playground.component.scss'
 })
 export class ShaderPlaygroundComponent implements AfterViewInit {
   @ViewChild('demoBase') demoBase!: DemoBaseComponent;
@@ -366,4 +274,3 @@ export class ShaderPlaygroundComponent implements AfterViewInit {
     (this.demoBase as any).startRenderLoop(render);
   }
 }
-

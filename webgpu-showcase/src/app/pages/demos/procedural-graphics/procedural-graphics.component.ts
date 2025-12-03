@@ -9,82 +9,8 @@ import { WebGPUContext } from '../../../types/webgpu.types';
   standalone: true,
   imports: [CommonModule, FormsModule, DemoBaseComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div class="demo-page">
-      <div class="demo-page__header">
-        <h1><span class="icon">🌀</span> Procedural Graphics</h1>
-      </div>
-      
-      <div class="demo-page__content">
-        <div class="demo-page__canvas-area">
-          <app-demo-base 
-            #demoBase
-            (contextReady)="onContextReady($event)"
-          ></app-demo-base>
-        </div>
-        
-        <div class="demo-page__controls">
-          <p class="demo-page__description">
-            Generate textures and patterns procedurally on the GPU using various 
-            noise functions and mathematical patterns.
-          </p>
-          
-          <h3>Pattern Type</h3>
-          
-          <div class="control-group">
-            <select [(ngModel)]="patternType" (change)="onPatternChange()">
-              <option *ngFor="let pattern of patterns" [value]="pattern.id">
-                {{ pattern.name }}
-              </option>
-            </select>
-          </div>
-
-          <h3>Parameters</h3>
-          
-          <div class="control-group">
-            <label>Scale: {{ scale.toFixed(1) }}</label>
-            <input type="range" min="1" max="20" step="0.5" [(ngModel)]="scale">
-          </div>
-
-          <div class="control-group">
-            <label>Speed: {{ speed.toFixed(1) }}</label>
-            <input type="range" min="0" max="3" step="0.1" [(ngModel)]="speed">
-          </div>
-
-          <div class="control-group">
-            <label>Complexity: {{ complexity }}</label>
-            <input type="range" min="1" max="8" step="1" [(ngModel)]="complexity">
-          </div>
-
-          <div class="pattern-info">
-            <h4>{{ getCurrentPattern()?.name }}</h4>
-            <p>{{ getCurrentPattern()?.description }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .pattern-info {
-      margin-top: 24px;
-      padding: 16px;
-      background: var(--bg-tertiary);
-      border-radius: 8px;
-      border-left: 3px solid var(--accent-tertiary);
-
-      h4 {
-        font-size: 0.9rem;
-        margin-bottom: 8px;
-        color: var(--accent-tertiary);
-      }
-
-      p {
-        font-size: 0.85rem;
-        color: var(--text-secondary);
-        line-height: 1.5;
-      }
-    }
-  `]
+  templateUrl: './procedural-graphics.component.html',
+  styleUrl: './procedural-graphics.component.scss'
 })
 export class ProceduralGraphicsComponent implements AfterViewInit {
   @ViewChild('demoBase') demoBase!: DemoBaseComponent;

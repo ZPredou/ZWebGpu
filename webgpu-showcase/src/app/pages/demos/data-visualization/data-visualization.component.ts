@@ -9,71 +9,8 @@ import { WebGPUContext } from '../../../types/webgpu.types';
   standalone: true,
   imports: [CommonModule, FormsModule, DemoBaseComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div class="demo-page">
-      <div class="demo-page__header">
-        <h1><span class="icon">📈</span> Data Visualization</h1>
-      </div>
-      
-      <div class="demo-page__content">
-        <div class="demo-page__canvas-area">
-          <app-demo-base 
-            #demoBase
-            (contextReady)="onContextReady($event)"
-          ></app-demo-base>
-        </div>
-        
-        <div class="demo-page__controls">
-          <p class="demo-page__description">
-            Render millions of data points efficiently with WebGPU. This demo showcases 
-            scatter plot visualization with real-time updates.
-          </p>
-          
-          <h3>Controls</h3>
-          
-          <div class="control-group">
-            <label>Point Count: {{ pointCount.toLocaleString() }}</label>
-            <input type="range" min="10000" max="1000000" step="10000" [(ngModel)]="pointCount" (change)="onPointCountChange()">
-          </div>
-
-          <div class="control-group">
-            <label>Point Size: {{ pointSize.toFixed(1) }}</label>
-            <input type="range" min="1" max="10" step="0.5" [(ngModel)]="pointSize">
-          </div>
-
-          <div class="control-group">
-            <label>Animation Speed: {{ animationSpeed.toFixed(1) }}</label>
-            <input type="range" min="0" max="2" step="0.1" [(ngModel)]="animationSpeed">
-          </div>
-
-          <div class="control-group">
-            <label>Data Pattern</label>
-            <select [(ngModel)]="dataPattern" (change)="onPatternChange()">
-              <option value="gaussian">Gaussian Clusters</option>
-              <option value="spiral">Spiral Galaxy</option>
-              <option value="grid">Grid Distribution</option>
-              <option value="random">Random Uniform</option>
-            </select>
-          </div>
-
-          <button class="btn btn--primary" (click)="regenerateData()">
-            Regenerate Data
-          </button>
-
-          <div class="stats-panel">
-            <div class="stats-panel__item">
-              <span class="label">Points</span>
-              <span class="value">{{ pointCount.toLocaleString() }}</span>
-            </div>
-            <div class="stats-panel__item">
-              <span class="label">Draw Mode</span>
-              <span class="value">Instanced</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `
+  templateUrl: './data-visualization.component.html',
+  styleUrl: './data-visualization.component.scss'
 })
 export class DataVisualizationComponent implements AfterViewInit {
   @ViewChild('demoBase') demoBase!: DemoBaseComponent;

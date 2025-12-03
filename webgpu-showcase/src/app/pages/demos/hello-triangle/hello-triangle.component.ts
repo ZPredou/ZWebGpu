@@ -8,67 +8,8 @@ import { WebGPUContext } from '../../../types/webgpu.types';
   standalone: true,
   imports: [CommonModule, DemoBaseComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div class="demo-page">
-      <div class="demo-page__header">
-        <h1><span class="icon">🔺</span> Hello Triangle</h1>
-      </div>
-      
-      <div class="demo-page__content">
-        <div class="demo-page__canvas-area">
-          <app-demo-base 
-            #demoBase
-            (contextReady)="onContextReady($event)"
-          ></app-demo-base>
-        </div>
-        
-        <div class="demo-page__controls">
-          <p class="demo-page__description">
-            The classic "Hello World" of graphics programming. This demo renders a colorful 
-            triangle using WebGPU's render pipeline, demonstrating vertex buffers, shaders, 
-            and basic rendering.
-          </p>
-          
-          <h3>Controls</h3>
-          
-          <div class="control-group">
-            <label>Rotation Speed</label>
-            <input 
-              type="range" 
-              min="0" 
-              max="5" 
-              step="0.1" 
-              [value]="rotationSpeed"
-              (input)="onRotationSpeedChange($event)"
-            >
-          </div>
-          
-          <div class="control-group">
-            <label>Scale</label>
-            <input 
-              type="range" 
-              min="0.1" 
-              max="2" 
-              step="0.1" 
-              [value]="scale"
-              (input)="onScaleChange($event)"
-            >
-          </div>
-
-          <div class="stats-panel">
-            <div class="stats-panel__item">
-              <span class="label">Vertices</span>
-              <span class="value">3</span>
-            </div>
-            <div class="stats-panel__item">
-              <span class="label">Draw Calls</span>
-              <span class="value">1</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `
+  templateUrl: './hello-triangle.component.html',
+  styleUrl: './hello-triangle.component.scss'
 })
 export class HelloTriangleComponent implements AfterViewInit {
   @ViewChild('demoBase') demoBase!: DemoBaseComponent;
@@ -213,7 +154,7 @@ export class HelloTriangleComponent implements AfterViewInit {
     const render = (time: number) => {
       if (!this.context || !this.pipeline || !this.vertexBuffer || !this.uniformBuffer || !this.bindGroup) return;
 
-      const { device, context, format } = this.context;
+      const { device, context } = this.context;
 
       // Update uniforms
       const uniforms = new Float32Array([
@@ -254,4 +195,3 @@ export class HelloTriangleComponent implements AfterViewInit {
     this.scale = parseFloat((event.target as HTMLInputElement).value);
   }
 }
-

@@ -1,0 +1,84 @@
+<div class="demo-page">
+  <div class="demo-page__header">
+    <h1><span class="icon">💫</span> Particle System</h1>
+  </div>
+  
+  <div class="demo-page__content">
+    <div class="demo-page__canvas-area">
+      <app-demo-base 
+        #demoBase
+        (contextReady)="onContextReady($event)"
+      ></app-demo-base>
+    </div>
+    
+    <div class="demo-page__controls">
+      <p class="demo-page__description">
+        GPU-computed particle simulation with thousands of particles. Each particle's 
+        position and velocity is updated in parallel using compute shaders.
+      </p>
+      
+      <h3>Controls</h3>
+      
+      <div class="control-group">
+        <label>Particle Count: {{ particleCount.toLocaleString() }}</label>
+        <input 
+          type="range" 
+          min="1000" 
+          max="100000" 
+          step="1000" 
+          [(ngModel)]="particleCount"
+          (change)="onParticleCountChange()"
+        >
+      </div>
+      
+      <div class="control-group">
+        <label>Gravity</label>
+        <input 
+          type="range" 
+          min="-2" 
+          max="2" 
+          step="0.1" 
+          [(ngModel)]="gravity"
+        >
+      </div>
+
+      <div class="control-group">
+        <label>Particle Size</label>
+        <input 
+          type="range" 
+          min="1" 
+          max="10" 
+          step="0.5" 
+          [(ngModel)]="particleSize"
+        >
+      </div>
+
+      <div class="control-group">
+        <label>Spawn Rate</label>
+        <input 
+          type="range" 
+          min="0" 
+          max="1" 
+          step="0.1" 
+          [(ngModel)]="spawnRate"
+        >
+      </div>
+
+      <button class="btn btn--primary" (click)="resetParticles()">
+        Reset Particles
+      </button>
+
+      <div class="stats-panel">
+        <div class="stats-panel__item">
+          <span class="label">Particles</span>
+          <span class="value">{{ particleCount.toLocaleString() }}</span>
+        </div>
+        <div class="stats-panel__item">
+          <span class="label">GPU Compute</span>
+          <span class="value">Yes</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

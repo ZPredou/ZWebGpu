@@ -8,78 +8,8 @@ import { WebGPUContext } from '../../../types/webgpu.types';
   standalone: true,
   imports: [CommonModule, DemoBaseComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div class="demo-page">
-      <div class="demo-page__header">
-        <h1><span class="icon">📦</span> Rotating 3D Cube</h1>
-      </div>
-      
-      <div class="demo-page__content">
-        <div class="demo-page__canvas-area">
-          <app-demo-base 
-            #demoBase
-            (contextReady)="onContextReady($event)"
-          ></app-demo-base>
-        </div>
-        
-        <div class="demo-page__controls">
-          <p class="demo-page__description">
-            A 3D cube with perspective projection and depth buffering. Demonstrates 
-            matrix transformations, indexed drawing, and proper depth testing.
-          </p>
-          
-          <h3>Controls</h3>
-          
-          <div class="control-group">
-            <label>X Rotation Speed</label>
-            <input 
-              type="range" 
-              min="0" 
-              max="3" 
-              step="0.1" 
-              [value]="rotationX"
-              (input)="rotationX = toNumber($event)"
-            >
-          </div>
-          
-          <div class="control-group">
-            <label>Y Rotation Speed</label>
-            <input 
-              type="range" 
-              min="0" 
-              max="3" 
-              step="0.1" 
-              [value]="rotationY"
-              (input)="rotationY = toNumber($event)"
-            >
-          </div>
-
-          <div class="control-group">
-            <label>Camera Distance</label>
-            <input 
-              type="range" 
-              min="2" 
-              max="10" 
-              step="0.5" 
-              [value]="cameraDistance"
-              (input)="cameraDistance = toNumber($event)"
-            >
-          </div>
-
-          <div class="stats-panel">
-            <div class="stats-panel__item">
-              <span class="label">Vertices</span>
-              <span class="value">24</span>
-            </div>
-            <div class="stats-panel__item">
-              <span class="label">Triangles</span>
-              <span class="value">12</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `
+  templateUrl: './rotating-cube.component.html',
+  styleUrl: './rotating-cube.component.scss'
 })
 export class RotatingCubeComponent implements AfterViewInit {
   @ViewChild('demoBase') demoBase!: DemoBaseComponent;
@@ -385,4 +315,3 @@ export class RotatingCubeComponent implements AfterViewInit {
     return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
   }
 }
-

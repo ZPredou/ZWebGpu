@@ -1,0 +1,32 @@
+<div class="demo-base">
+  <!-- Loading State -->
+  <div class="webgpu-loading" *ngIf="loading()">
+    <div class="webgpu-loading__spinner"></div>
+    <div class="webgpu-loading__text">Initializing WebGPU...</div>
+  </div>
+
+  <!-- Error State -->
+  <div class="webgpu-error" *ngIf="error()">
+    <div class="webgpu-error__icon">⚠️</div>
+    <h3 class="webgpu-error__title">WebGPU Error</h3>
+    <p class="webgpu-error__message">{{ error() }}</p>
+  </div>
+
+  <!-- Canvas -->
+  <div class="webgpu-canvas-container" [class.hidden]="loading() || error()">
+    <canvas #canvas></canvas>
+  </div>
+
+  <!-- Stats Overlay -->
+  <div class="stats-overlay" *ngIf="showStats && !loading() && !error()">
+    <div class="stats-overlay__item">
+      <span class="label">FPS</span>
+      <span class="value">{{ fps() }}</span>
+    </div>
+    <div class="stats-overlay__item" *ngIf="customStats()">
+      <span class="label">{{ customStats()!.label }}</span>
+      <span class="value">{{ customStats()!.value }}</span>
+    </div>
+  </div>
+</div>
+

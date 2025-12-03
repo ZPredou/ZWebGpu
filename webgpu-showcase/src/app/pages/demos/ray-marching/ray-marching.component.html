@@ -1,0 +1,71 @@
+<div class="demo-page">
+  <div class="demo-page__header">
+    <h1><span class="icon">🔮</span> Ray Marching</h1>
+  </div>
+  
+  <div class="demo-page__content">
+    <div class="demo-page__canvas-area">
+      <app-demo-base 
+        #demoBase
+        (contextReady)="onContextReady($event)"
+      ></app-demo-base>
+    </div>
+    
+    <div class="demo-page__controls">
+      <p class="demo-page__description">
+        Real-time ray marching with signed distance functions (SDFs). Renders 
+        complex 3D scenes with soft shadows and ambient occlusion.
+      </p>
+      
+      <h3>Scene</h3>
+      
+      <div class="control-group">
+        <select [(ngModel)]="scene" (change)="onSceneChange()">
+          <option value="spheres">Floating Spheres</option>
+          <option value="mandelbulb">Mandelbulb Fractal</option>
+          <option value="geometric">Geometric Shapes</option>
+          <option value="infinite">Infinite Columns</option>
+        </select>
+      </div>
+
+      <h3>Rendering</h3>
+      
+      <div class="control-group">
+        <label>Max Steps: {{ maxSteps }}</label>
+        <input type="range" min="32" max="256" step="16" [(ngModel)]="maxSteps">
+      </div>
+
+      <div class="control-group">
+        <label>Shadow Softness: {{ shadowSoftness.toFixed(1) }}</label>
+        <input type="range" min="1" max="32" step="1" [(ngModel)]="shadowSoftness">
+      </div>
+
+      <div class="control-group">
+        <label>
+          <input type="checkbox" [(ngModel)]="enableAO">
+          Ambient Occlusion
+        </label>
+      </div>
+
+      <div class="control-group">
+        <label>
+          <input type="checkbox" [(ngModel)]="enableShadows">
+          Soft Shadows
+        </label>
+      </div>
+
+      <div class="control-group">
+        <label>Animation Speed: {{ animSpeed.toFixed(1) }}</label>
+        <input type="range" min="0" max="2" step="0.1" [(ngModel)]="animSpeed">
+      </div>
+
+      <div class="stats-panel">
+        <div class="stats-panel__item">
+          <span class="label">Max Steps</span>
+          <span class="value">{{ maxSteps }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

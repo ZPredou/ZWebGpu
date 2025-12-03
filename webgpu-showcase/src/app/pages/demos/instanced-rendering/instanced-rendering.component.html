@@ -1,0 +1,69 @@
+<div class="demo-page">
+  <div class="demo-page__header">
+    <h1><span class="icon">🏗️</span> Instanced Rendering</h1>
+  </div>
+  
+  <div class="demo-page__content">
+    <div class="demo-page__canvas-area">
+      <app-demo-base 
+        #demoBase
+        (contextReady)="onContextReady($event)"
+      ></app-demo-base>
+    </div>
+    
+    <div class="demo-page__controls">
+      <p class="demo-page__description">
+        Draw thousands of objects efficiently using GPU instancing. Each cube has 
+        unique position, rotation, and color computed per-instance.
+      </p>
+      
+      <h3>Controls</h3>
+      
+      <div class="control-group">
+        <label>Instance Count: {{ instanceCount.toLocaleString() }}</label>
+        <input type="range" min="100" max="50000" step="100" [(ngModel)]="instanceCount" (change)="onInstanceCountChange()">
+      </div>
+
+      <div class="control-group">
+        <label>Cube Size: {{ cubeSize.toFixed(2) }}</label>
+        <input type="range" min="0.01" max="0.2" step="0.01" [(ngModel)]="cubeSize">
+      </div>
+
+      <div class="control-group">
+        <label>Rotation Speed: {{ rotationSpeed.toFixed(1) }}</label>
+        <input type="range" min="0" max="3" step="0.1" [(ngModel)]="rotationSpeed">
+      </div>
+
+      <div class="control-group">
+        <label>Spread: {{ spread.toFixed(1) }}</label>
+        <input type="range" min="1" max="10" step="0.5" [(ngModel)]="spread" (change)="onInstanceCountChange()">
+      </div>
+
+      <div class="control-group">
+        <label>Pattern</label>
+        <select [(ngModel)]="pattern" (change)="onInstanceCountChange()">
+          <option value="cube">Cube Grid</option>
+          <option value="sphere">Sphere Surface</option>
+          <option value="spiral">Spiral</option>
+          <option value="random">Random Cloud</option>
+        </select>
+      </div>
+
+      <div class="stats-panel">
+        <div class="stats-panel__item">
+          <span class="label">Instances</span>
+          <span class="value">{{ instanceCount.toLocaleString() }}</span>
+        </div>
+        <div class="stats-panel__item">
+          <span class="label">Triangles</span>
+          <span class="value">{{ (instanceCount * 12).toLocaleString() }}</span>
+        </div>
+        <div class="stats-panel__item">
+          <span class="label">Draw Calls</span>
+          <span class="value">1</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

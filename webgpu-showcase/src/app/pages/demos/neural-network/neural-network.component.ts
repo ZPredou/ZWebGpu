@@ -9,75 +9,8 @@ import { WebGPUContext } from '../../../types/webgpu.types';
   standalone: true,
   imports: [CommonModule, FormsModule, DemoBaseComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div class="demo-page">
-      <div class="demo-page__header">
-        <h1><span class="icon">🧠</span> Neural Network</h1>
-      </div>
-      
-      <div class="demo-page__content">
-        <div class="demo-page__canvas-area">
-          <app-demo-base 
-            #demoBase
-            (contextReady)="onContextReady($event)"
-          ></app-demo-base>
-        </div>
-        
-        <div class="demo-page__controls">
-          <p class="demo-page__description">
-            A simple neural network classifier visualized in real-time. The network 
-            learns to classify points into different regions based on their position.
-          </p>
-          
-          <h3>Network Architecture</h3>
-          
-          <div class="control-group">
-            <label>Hidden Layer Size: {{ hiddenSize }}</label>
-            <input type="range" min="4" max="32" step="4" [(ngModel)]="hiddenSize" (change)="onNetworkChange()">
-          </div>
-
-          <div class="control-group">
-            <label>Classification Pattern</label>
-            <select [(ngModel)]="pattern" (change)="onPatternChange()">
-              <option value="circle">Circle</option>
-              <option value="xor">XOR</option>
-              <option value="spiral">Spiral</option>
-              <option value="gaussian">Gaussian Mixture</option>
-            </select>
-          </div>
-
-          <h3>Training</h3>
-
-          <div class="control-group">
-            <label>Learning Rate: {{ learningRate.toFixed(3) }}</label>
-            <input type="range" min="0.001" max="0.1" step="0.001" [(ngModel)]="learningRate">
-          </div>
-
-          <div class="control-group">
-            <label>
-              <input type="checkbox" [(ngModel)]="isTraining">
-              Training Active
-            </label>
-          </div>
-
-          <button class="btn btn--primary" (click)="resetNetwork()">
-            Reset Network
-          </button>
-
-          <div class="stats-panel">
-            <div class="stats-panel__item">
-              <span class="label">Epoch</span>
-              <span class="value">{{ epoch().toLocaleString() }}</span>
-            </div>
-            <div class="stats-panel__item">
-              <span class="label">Loss</span>
-              <span class="value">{{ loss().toFixed(4) }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `
+  templateUrl: './neural-network.component.html',
+  styleUrl: './neural-network.component.scss'
 })
 export class NeuralNetworkComponent implements AfterViewInit {
   @ViewChild('demoBase') demoBase!: DemoBaseComponent;

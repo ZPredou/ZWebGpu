@@ -1,0 +1,64 @@
+<div class="demo-page">
+  <div class="demo-page__header">
+    <h1><span class="icon">🌊</span> Physics Simulation</h1>
+  </div>
+  
+  <div class="demo-page__content">
+    <div class="demo-page__canvas-area">
+      <app-demo-base 
+        #demoBase
+        (contextReady)="onContextReady($event)"
+      ></app-demo-base>
+    </div>
+    
+    <div class="demo-page__controls">
+      <p class="demo-page__description">
+        GPU-accelerated cloth simulation using Verlet integration. Each vertex 
+        position is computed in parallel using compute shaders.
+      </p>
+      
+      <h3>Controls</h3>
+      
+      <div class="control-group">
+        <label>Grid Size: {{ gridSize }}×{{ gridSize }}</label>
+        <input type="range" min="16" max="64" step="8" [(ngModel)]="gridSize" (change)="onGridSizeChange()">
+      </div>
+
+      <div class="control-group">
+        <label>Gravity: {{ gravity.toFixed(2) }}</label>
+        <input type="range" min="0" max="2" step="0.1" [(ngModel)]="gravity">
+      </div>
+
+      <div class="control-group">
+        <label>Stiffness: {{ stiffness.toFixed(2) }}</label>
+        <input type="range" min="0.1" max="1" step="0.05" [(ngModel)]="stiffness">
+      </div>
+
+      <div class="control-group">
+        <label>Damping: {{ damping.toFixed(2) }}</label>
+        <input type="range" min="0.9" max="0.999" step="0.001" [(ngModel)]="damping">
+      </div>
+
+      <div class="control-group">
+        <label>Wind: {{ wind.toFixed(2) }}</label>
+        <input type="range" min="0" max="1" step="0.05" [(ngModel)]="wind">
+      </div>
+
+      <button class="btn btn--primary" (click)="resetSimulation()">
+        Reset Simulation
+      </button>
+
+      <div class="stats-panel">
+        <div class="stats-panel__item">
+          <span class="label">Vertices</span>
+          <span class="value">{{ (gridSize * gridSize).toLocaleString() }}</span>
+        </div>
+        <div class="stats-panel__item">
+          <span class="label">Constraints</span>
+          <span class="value">{{ constraintCount.toLocaleString() }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

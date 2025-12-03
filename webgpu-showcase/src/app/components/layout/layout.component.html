@@ -1,0 +1,55 @@
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.sidebar--collapsed]="sidebarCollapsed()">
+    <div class="sidebar__header">
+      <div class="logo">
+        <span class="logo__icon">⚡</span>
+        <span class="logo__text" *ngIf="!sidebarCollapsed()">WebGPU Lab</span>
+      </div>
+      <button class="sidebar__toggle" (click)="toggleSidebar()">
+        {{ sidebarCollapsed() ? '→' : '←' }}
+      </button>
+    </div>
+
+    <nav class="sidebar__nav">
+      <a class="nav-item nav-item--home" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+        <span class="nav-item__icon">🏠</span>
+        <span class="nav-item__text" *ngIf="!sidebarCollapsed()">Home</span>
+      </a>
+
+      <div class="nav-category" *ngFor="let category of categories">
+        <div class="nav-category__header" *ngIf="!sidebarCollapsed()">
+          <span class="nav-category__icon">{{ getCategoryInfo(category).icon }}</span>
+          <span class="nav-category__label">{{ getCategoryInfo(category).label }}</span>
+        </div>
+        
+        <a 
+          *ngFor="let demo of getDemos(category)"
+          class="nav-item"
+          [routerLink]="demo.route"
+          routerLinkActive="active"
+          [title]="demo.title"
+        >
+          <span class="nav-item__icon">{{ demo.icon }}</span>
+          <span class="nav-item__text" *ngIf="!sidebarCollapsed()">{{ demo.title }}</span>
+          <span class="nav-item__badge" *ngIf="!sidebarCollapsed()" [attr.data-difficulty]="demo.difficulty">
+            {{ getDifficultyLabel(demo.difficulty) }}
+          </span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar__footer" *ngIf="!sidebarCollapsed()">
+      <div class="gpu-info">
+        <span class="gpu-info__label">Powered by</span>
+        <span class="gpu-info__value">WebGPU API</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main">
+    <router-outlet></router-outlet>
+  </main>
+</div>
+
