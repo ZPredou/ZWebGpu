@@ -99,7 +99,12 @@ export class FractalRendererComponent implements AfterViewInit {
           }
           if (i == maxIter) { return 0.0; }
           let smooth_i = f32(i) - log2(log2(dot(z, z)));
-          return smooth_i / f32(maxIter);
+          // Normalize with fixed reference scale for consistent brightness
+          let refScale = 200.0;
+          let normalized = smooth_i / refScale;
+          // Apply brightness boost for high iteration counts
+          let brightness = 1.0 + log2(f32(maxIter) / refScale) * 0.15;
+          return min(1.0, normalized * brightness);
         }
       `,
       julia: `
@@ -113,7 +118,12 @@ export class FractalRendererComponent implements AfterViewInit {
           }
           if (i == maxIter) { return 0.0; }
           let smooth_i = f32(i) - log2(log2(dot(z, z)));
-          return smooth_i / f32(maxIter);
+          // Normalize with fixed reference scale for consistent brightness
+          let refScale = 200.0;
+          let normalized = smooth_i / refScale;
+          // Apply brightness boost for high iteration counts
+          let brightness = 1.0 + log2(f32(maxIter) / refScale) * 0.15;
+          return min(1.0, normalized * brightness);
         }
       `,
       burning_ship: `
@@ -127,7 +137,12 @@ export class FractalRendererComponent implements AfterViewInit {
           }
           if (i == maxIter) { return 0.0; }
           let smooth_i = f32(i) - log2(log2(dot(z, z)));
-          return smooth_i / f32(maxIter);
+          // Normalize with fixed reference scale for consistent brightness
+          let refScale = 200.0;
+          let normalized = smooth_i / refScale;
+          // Apply brightness boost for high iteration counts
+          let brightness = 1.0 + log2(f32(maxIter) / refScale) * 0.15;
+          return min(1.0, normalized * brightness);
         }
       `,
     };
@@ -180,35 +195,38 @@ export class FractalRendererComponent implements AfterViewInit {
         fn colorize(t: f32, scheme: i32) -> vec3f {
           if (t == 0.0) { return vec3f(0.0); }
           
+          // Apply brightness boost to compensate for high iteration counts
+          let boosted_t = pow(t, 0.75) * 1.2;
+          
           var color: vec3f;
           
           if (scheme == 0) {
             // Classic blue-white
-            color = vec3f(t * 0.5, t * 0.8, t);
+            color = vec3f(boosted_t * 0.55, boosted_t * 0.85, boosted_t * 1.0);
           } else if (scheme == 1) {
             // Fire
             color = vec3f(
-              min(1.0, t * 3.0),
-              max(0.0, t * 2.0 - 0.5),
-              max(0.0, t - 0.75) * 4.0
+              min(1.0, boosted_t * 3.0),
+              max(0.0, boosted_t * 2.2 - 0.4),
+              max(0.0, boosted_t - 0.7) * 4.0
             );
           } else if (scheme == 2) {
             // Ice
             color = vec3f(
-              max(0.0, t - 0.5) * 2.0,
-              t * 0.8,
-              min(1.0, t * 1.5)
+              max(0.0, boosted_t - 0.5) * 2.2,
+              boosted_t * 0.9,
+              min(1.0, boosted_t * 1.6)
             );
           } else {
             // Rainbow
             color = vec3f(
-              sin(t * 6.28318 + 0.0) * 0.5 + 0.5,
-              sin(t * 6.28318 + 2.094) * 0.5 + 0.5,
-              sin(t * 6.28318 + 4.188) * 0.5 + 0.5
+              sin(boosted_t * 6.28318 + 0.0) * 0.5 + 0.5,
+              sin(boosted_t * 6.28318 + 2.094) * 0.5 + 0.5,
+              sin(boosted_t * 6.28318 + 4.188) * 0.5 + 0.5
             );
           }
           
-          return color;
+          return min(vec3f(1.0), color);
         }
 
         @fragment
