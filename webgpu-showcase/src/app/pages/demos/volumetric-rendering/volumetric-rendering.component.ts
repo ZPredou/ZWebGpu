@@ -84,7 +84,7 @@ export class VolumetricRenderingComponent implements AfterViewInit {
 
         fn noise(p: vec3f) -> f32 {
           let i = floor(p);
-          let f = fract(p);
+          var f = fract(p);
           f = f * f * (3.0 - 2.0 * f);
           
           let n = i.x + i.y * 57.0 + 113.0 * i.z;
@@ -182,8 +182,8 @@ export class VolumetricRenderingComponent implements AfterViewInit {
           
           // Camera setup
           let cameraPos = vec3f(0.0, 0.0, 4.0);
-          let target = vec3f(0.0, 0.0, 0.0);
-          let forward = normalize(target - cameraPos);
+          let lookAt = vec3f(0.0, 0.0, 0.0);
+          let forward = normalize(lookAt - cameraPos);
           let right = normalize(cross(forward, vec3f(0.0, 1.0, 0.0)));
           let up = cross(right, forward);
           

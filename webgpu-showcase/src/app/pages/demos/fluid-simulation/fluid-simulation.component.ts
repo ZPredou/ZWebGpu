@@ -57,7 +57,8 @@ export class FluidSimulationComponent implements AfterViewInit {
     if (!this.context) return;
 
     const { device } = this.context;
-    const size = this.gridSize * this.gridSize * 4; // RGBA
+    const elementCount = this.gridSize * this.gridSize * 4; // RGBA (4 floats per pixel)
+    const size = elementCount * 4; // 4 bytes per float
 
     // Clear all buffers
     this.velocityBuffers.forEach(b => b.destroy());
@@ -69,7 +70,7 @@ export class FluidSimulationComponent implements AfterViewInit {
         size,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
       });
-      device.queue.writeBuffer(buffer, 0, new Float32Array(this.gridSize * this.gridSize * 4));
+      device.queue.writeBuffer(buffer, 0, new Float32Array(elementCount));
       return buffer;
     });
 
@@ -78,16 +79,16 @@ export class FluidSimulationComponent implements AfterViewInit {
         size,
         usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
       });
-      device.queue.writeBuffer(buffer, 0, new Float32Array(this.gridSize * this.gridSize * 4));
+      device.queue.writeBuffer(buffer, 0, new Float32Array(elementCount));
       return buffer;
     });
 
     this.colorBuffers = [0, 1].map(() => {
       const buffer = device.createBuffer({
         size,
-        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST | GPUTextureUsage.TEXTURE_BINDING,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
       });
-      device.queue.writeBuffer(buffer, 0, new Float32Array(this.gridSize * this.gridSize * 4));
+      device.queue.writeBuffer(buffer, 0, new Float32Array(elementCount));
       return buffer;
     });
   }
@@ -129,16 +130,6 @@ export class FluidSimulationComponent implements AfterViewInit {
           return y * uniforms.gridSize + x;
         }
 
-        fn getValue(buffer: array<vec4f>, x: u32, y: u32) -> vec4f {
-          let idx = getIndex(x, y);
-          return buffer[idx];
-        }
-
-        fn setValue(buffer: array<vec4f>, x: u32, y: u32, value: vec4f) {
-          let idx = getIndex(x, y);
-          buffer[idx] = value;
-        }
-
         @compute @workgroup_size(8, 8)
         fn main(@builtin(global_invocation_id) id: vec3u) {
           let x = id.x;
@@ -154,62 +145,73 @@ export class FluidSimulationComponent implements AfterViewInit {
           let dy = f32(y) - centerY;
           let dist = sqrt(dx * dx + dy * dy);
           
+          let idx = getIndex(x, y);
+          
           if (dist < 10.0) {
             let force = uniforms.force * (1.0 - dist / 10.0);
             let angle = uniforms.time * 2.0;
             let fx = cos(angle) * force;
             let fy = sin(angle) * force;
             
-            let vel = getValue(velocityIn, x, y);
-            vel.xy += vec2f(fx, fy) * uniforms.deltaTime;
-            setValue(velocityOut, x, y, vel);
+            let vel = velocityIn[idx];
+            let newVel = vec4f(
+              vel.x + fx * uniforms.deltaTime,
+              vel.y + fy * uniforms.deltaTime,
+              vel.z,
+              vel.w
+            );
+            velocityOut[idx] = newVel;
             
             // Add colored density
-            let dens = getValue(densityIn, x, y);
-            dens.w += 0.1 * uniforms.deltaTime;
-            setValue(densityOut, x, y, dens);
+            let dens = densityIn[idx];
+            let newDens = vec4f(dens.x, dens.y, dens.z, dens.w + 2.0 * uniforms.deltaTime);
+            densityOut[idx] = newDens;
             
-            let col = getValue(colorIn, x, y);
-            col.rgb = vec3f(0.2 + sin(uniforms.time) * 0.3, 0.4 + cos(uniforms.time * 0.7) * 0.3, 0.8);
-            col.w = 1.0;
-            setValue(colorOut, x, y, col);
+            let newCol = vec4f(
+              0.2 + sin(uniforms.time) * 0.3,
+              0.4 + cos(uniforms.time * 0.7) * 0.3,
+              0.8,
+              1.0
+            );
+            colorOut[idx] = newCol;
           } else {
             // Advect velocity
-            let vel = getValue(velocityIn, x, y);
+            let vel = velocityIn[idx];
             let prevX = f32(x) - vel.x * uniforms.deltaTime * f32(gridSize);
             let prevY = f32(y) - vel.y * uniforms.deltaTime * f32(gridSize);
             
             let px = u32(clamp(prevX, 0.0, f32(gridSize - 1)));
             let py = u32(clamp(prevY, 0.0, f32(gridSize - 1)));
+            let prevIdx = getIndex(px, py);
             
-            let advectedVel = getValue(velocityIn, px, py);
-            vel = mix(vel, advectedVel, 0.9);
+            let advectedVel = velocityIn[prevIdx];
+            var newVel = mix(vel, advectedVel, 0.9);
             
             // Viscosity
             let neighbors = (
-              getValue(velocityIn, x, y) +
-              getValue(velocityIn, max(0u, x - 1u), y) +
-              getValue(velocityIn, min(gridSize - 1u, x + 1u), y) +
-              getValue(velocityIn, x, max(0u, y - 1u)) +
-              getValue(velocityIn, x, min(gridSize - 1u, y + 1u))
+              velocityIn[idx] +
+              velocityIn[getIndex(max(0u, x - 1u), y)] +
+              velocityIn[getIndex(min(gridSize - 1u, x + 1u), y)] +
+              velocityIn[getIndex(x, max(0u, y - 1u))] +
+              velocityIn[getIndex(x, min(gridSize - 1u, y + 1u))]
             ) / 5.0;
             
-            vel = mix(vel, neighbors, uniforms.viscosity);
-            setValue(velocityOut, x, y, vel);
+            newVel = mix(newVel, neighbors, uniforms.viscosity);
+            velocityOut[idx] = newVel;
             
             // Advect density
-            let dens = getValue(densityIn, x, y);
-            let advectedDens = getValue(densityIn, px, py);
-            dens = mix(dens, advectedDens, 0.95);
-            dens.w *= 0.99; // Decay
-            setValue(densityOut, x, y, dens);
+            let dens = densityIn[idx];
+            let advectedDens = densityIn[prevIdx];
+            var newDens = mix(dens, advectedDens, 0.95);
+            newDens = vec4f(newDens.x, newDens.y, newDens.z, newDens.w * 0.99); // Decay
+            densityOut[idx] = newDens;
             
             // Advect color
-            let col = getValue(colorIn, x, y);
-            let advectedCol = getValue(colorIn, px, py);
-            col = mix(col, advectedCol, 0.95);
-            col.w *= 0.99;
-            setValue(colorOut, x, y, col);
+            let col = colorIn[idx];
+            let advectedCol = colorIn[prevIdx];
+            var newCol = mix(col, advectedCol, 0.95);
+            newCol = vec4f(newCol.x, newCol.y, newCol.z, newCol.w * 0.99);
+            colorOut[idx] = newCol;
           }
         }
       `
@@ -297,8 +299,8 @@ export class FluidSimulationComponent implements AfterViewInit {
         @fragment
         fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
           let uv = input.uv;
-          let x = u32(uv.x * f32(uniforms.gridSize));
-          let y = u32(uv.y * f32(uniforms.gridSize));
+          let x = u32(clamp(uv.x * f32(uniforms.gridSize), 0.0, f32(uniforms.gridSize - 1u)));
+          let y = u32(clamp(uv.y * f32(uniforms.gridSize), 0.0, f32(uniforms.gridSize - 1u)));
           let idx = y * uniforms.gridSize + x;
           
           if (uniforms.showVelocity == 1u) {
@@ -315,7 +317,10 @@ export class FluidSimulationComponent implements AfterViewInit {
           } else {
             let dens = density[idx];
             let col = color[idx];
-            let finalColor = col.rgb * dens.w * uniforms.colorIntensity;
+            let alpha = dens.w;
+            // Add a small base color so we can see something even when density is low
+            let baseColor = vec3f(0.05, 0.05, 0.1);
+            let finalColor = baseColor + col.rgb * alpha * uniforms.colorIntensity;
             return vec4f(finalColor, 1.0);
           }
         }
@@ -367,7 +372,7 @@ export class FluidSimulationComponent implements AfterViewInit {
       const floatView = new Float32Array(uniforms);
       const uintView = new Uint32Array(uniforms);
       
-      floatView[0] = this.gridSize;
+      uintView[0] = this.gridSize; // u32
       floatView[1] = this.viscosity;
       floatView[2] = this.diffusion;
       floatView[3] = this.force;
@@ -391,9 +396,9 @@ export class FluidSimulationComponent implements AfterViewInit {
       const renderUniforms = new ArrayBuffer(32);
       const renderFloatView = new Float32Array(renderUniforms);
       const renderUintView = new Uint32Array(renderUniforms);
-      renderUintView[0] = this.gridSize;
+      renderUintView[0] = this.gridSize; // u32
       renderFloatView[1] = this.colorIntensity;
-      renderUintView[2] = this.showVelocity ? 1 : 0;
+      renderUintView[2] = this.showVelocity ? 1 : 0; // u32
 
       const renderUniformBuffer = device.createBuffer({
         size: 32,
@@ -401,6 +406,7 @@ export class FluidSimulationComponent implements AfterViewInit {
       });
       device.queue.writeBuffer(renderUniformBuffer, 0, renderUniforms);
 
+      // Read from the output buffer (the one we just wrote to in compute pass)
       const densBuf = this.densityBuffers[(this.step + 1) % 2];
       const velBuf = this.velocityBuffers[(this.step + 1) % 2];
       const colBuf = this.colorBuffers[(this.step + 1) % 2];

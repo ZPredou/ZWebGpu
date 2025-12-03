@@ -184,45 +184,52 @@ export class RigidBodyPhysicsComponent implements AfterViewInit {
           let radius = pos.w;
 
           // Apply gravity
-          vel.y -= uniforms.gravity * uniforms.deltaTime;
+          vel = vec4f(vel.x, vel.y - uniforms.gravity * uniforms.deltaTime, vel.z, vel.w);
 
           // Update position
-          pos.xyz += vel.xyz * uniforms.deltaTime;
+          pos = vec4f(
+            pos.x + vel.x * uniforms.deltaTime,
+            pos.y + vel.y * uniforms.deltaTime,
+            pos.z + vel.z * uniforms.deltaTime,
+            pos.w
+          );
 
           // Collision with bounds
           if (pos.x - radius < uniforms.bounds.x) {
-            pos.x = uniforms.bounds.x + radius;
-            vel.x *= -uniforms.restitution;
-            vel.x *= (1.0 - uniforms.friction);
+            pos = vec4f(uniforms.bounds.x + radius, pos.y, pos.z, pos.w);
+            vel = vec4f(vel.x * -uniforms.restitution * (1.0 - uniforms.friction), vel.y, vel.z, vel.w);
           }
           if (pos.x + radius > uniforms.bounds.y) {
-            pos.x = uniforms.bounds.y - radius;
-            vel.x *= -uniforms.restitution;
-            vel.x *= (1.0 - uniforms.friction);
+            pos = vec4f(uniforms.bounds.y - radius, pos.y, pos.z, pos.w);
+            vel = vec4f(vel.x * -uniforms.restitution * (1.0 - uniforms.friction), vel.y, vel.z, vel.w);
           }
 
           if (pos.y - radius < uniforms.bounds.z) {
-            pos.y = uniforms.bounds.z + radius;
-            vel.y *= -uniforms.restitution;
-            vel.x *= (1.0 - uniforms.friction);
-            vel.z *= (1.0 - uniforms.friction);
+            pos = vec4f(pos.x, uniforms.bounds.z + radius, pos.z, pos.w);
+            vel = vec4f(
+              vel.x * (1.0 - uniforms.friction),
+              vel.y * -uniforms.restitution,
+              vel.z * (1.0 - uniforms.friction),
+              vel.w
+            );
           }
           if (pos.y + radius > uniforms.bounds.w) {
-            pos.y = uniforms.bounds.w - radius;
-            vel.y *= -uniforms.restitution;
-            vel.x *= (1.0 - uniforms.friction);
-            vel.z *= (1.0 - uniforms.friction);
+            pos = vec4f(pos.x, uniforms.bounds.w - radius, pos.z, pos.w);
+            vel = vec4f(
+              vel.x * (1.0 - uniforms.friction),
+              vel.y * -uniforms.restitution,
+              vel.z * (1.0 - uniforms.friction),
+              vel.w
+            );
           }
 
           if (pos.z - radius < uniforms.bounds.x) {
-            pos.z = uniforms.bounds.x + radius;
-            vel.z *= -uniforms.restitution;
-            vel.z *= (1.0 - uniforms.friction);
+            pos = vec4f(pos.x, pos.y, uniforms.bounds.x + radius, pos.w);
+            vel = vec4f(vel.x, vel.y, vel.z * -uniforms.restitution * (1.0 - uniforms.friction), vel.w);
           }
           if (pos.z + radius > uniforms.bounds.y) {
-            pos.z = uniforms.bounds.y - radius;
-            vel.z *= -uniforms.restitution;
-            vel.z *= (1.0 - uniforms.friction);
+            pos = vec4f(pos.x, pos.y, uniforms.bounds.y - radius, pos.w);
+            vel = vec4f(vel.x, vel.y, vel.z * -uniforms.restitution * (1.0 - uniforms.friction), vel.w);
           }
 
           // Collision between bodies
@@ -244,19 +251,28 @@ export class RigidBodyPhysicsComponent implements AfterViewInit {
               
               if (velAlongNormal > 0.0) { continue; }
               
-              let impulse = -(1.0 + uniforms.restitution) * velAlongNormal;
-              impulse /= 2.0; // Assume equal mass
+              let impulse = -(1.0 + uniforms.restitution) * velAlongNormal / 2.0; // Assume equal mass
               
-              vel.xyz += normal * impulse;
+              vel = vec4f(
+                vel.x + normal.x * impulse,
+                vel.y + normal.y * impulse,
+                vel.z + normal.z * impulse,
+                vel.w
+              );
               
               // Separate bodies
               let overlap = minDist - dist;
-              pos.xyz += normal * overlap * 0.5;
+              pos = vec4f(
+                pos.x + normal.x * overlap * 0.5,
+                pos.y + normal.y * overlap * 0.5,
+                pos.z + normal.z * overlap * 0.5,
+                pos.w
+              );
             }
           }
 
           // Damping
-          vel.xyz *= 0.999;
+          vel = vec4f(vel.x * 0.999, vel.y * 0.999, vel.z * 0.999, vel.w);
 
           posOut[idx] = pos;
           velOut[idx] = vel;
@@ -322,24 +338,26 @@ export class RigidBodyPhysicsComponent implements AfterViewInit {
 
         struct VertexOutput {
           @builtin(position) position: vec4f,
-          @location(0) worldPos: vec3f,
+          @location(0) normal: vec3f,
         }
 
         @vertex
         fn vertexMain(input: VertexInput) -> VertexOutput {
           let radius = input.instancePos.w;
           let worldPos = input.instancePos.xyz + input.position * radius;
+          // For a sphere, the normal is the normalized direction from center to surface
+          let normal = normalize(input.position);
           
           var output: VertexOutput;
           output.position = uniforms.viewProjection * vec4f(worldPos, 1.0);
-          output.worldPos = worldPos;
+          output.normal = normal;
           return output;
         }
 
         @fragment
         fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
           let lightDir = normalize(vec3f(1.0, 1.0, 1.0));
-          let normal = normalize(input.worldPos - input.worldPos); // Simplified
+          let normal = normalize(input.normal);
           let diffuse = max(0.0, dot(normal, lightDir));
           let ambient = 0.3;
           
@@ -436,7 +454,7 @@ export class RigidBodyPhysicsComponent implements AfterViewInit {
       // Create MVP matrix
       const aspect = canvas.width / canvas.height;
       const t = time * 0.0005;
-      const camPos = [Math.sin(t) * 8, 5, Math.cos(t) * 8];
+      const camPos = [Math.sin(t) * 12, 6, Math.cos(t) * 12];
       const mvp = this.createViewProjection(camPos, aspect);
       device.queue.writeBuffer((this as any).mvpBuffer, 0, new Float32Array(mvp));
 
@@ -480,7 +498,7 @@ export class RigidBodyPhysicsComponent implements AfterViewInit {
 
   private createViewProjection(eye: number[], aspect: number): number[] {
     const projection = this.perspective(Math.PI / 4, aspect, 0.1, 100);
-    const view = this.lookAt(eye, [0, 2, 0], [0, 1, 0]);
+    const view = this.lookAt(eye, [0, 4, 0], [0, 1, 0]);
     return this.multiply(projection, view);
   }
 

@@ -15,8 +15,8 @@ import { WebGPUContext } from '../../../types/webgpu.types';
 export class PathTracingComponent implements AfterViewInit {
   @ViewChild('demoBase') demoBase!: DemoBaseComponent;
 
-  samplesPerPixel = 1;
-  maxBounces = 4;
+  samplesPerPixel = 4;
+  maxBounces = 8;
   exposure = 1.0;
   showAccumulation = true;
   frameCount = 0;
@@ -114,6 +114,10 @@ export class PathTracingComponent implements AfterViewInit {
           return vec3f(r * cos(phi), r * sin(phi), z);
         }
 
+        fn reflect(incident: vec3f, normal: vec3f) -> vec3f {
+          return incident - 2.0 * dot(incident, normal) * normal;
+        }
+
         struct Ray {
           origin: vec3f,
           direction: vec3f,
@@ -196,6 +200,8 @@ export class PathTracingComponent implements AfterViewInit {
             // Material properties
             var albedo = vec3f(0.8);
             var emission = vec3f(0.0);
+            var isMetal = false;
+            var isGlass = false;
             
             if (hit.material == 1u) {
               // Checkerboard floor
@@ -207,9 +213,11 @@ export class PathTracingComponent implements AfterViewInit {
             } else if (hit.material == 3u) {
               // Left sphere - metal
               albedo = vec3f(0.8, 0.8, 0.9);
+              isMetal = true;
             } else if (hit.material == 4u) {
               // Right sphere - glass
               albedo = vec3f(0.9, 0.9, 0.95);
+              isGlass = true;
             }
 
             // Add emission for light
@@ -219,11 +227,62 @@ export class PathTracingComponent implements AfterViewInit {
 
             color += throughput * emission;
 
-            // Sample new direction
-            let newDir = normalize(hit.normal + randomOnSphere(currentSeed));
-            currentSeed = hash(currentSeed + 1u);
+            // Sample new direction based on material type
+            var newDir: vec3f;
+            var newThroughput: vec3f;
             
-            throughput *= albedo * max(0.0, dot(newDir, hit.normal));
+            if (isMetal) {
+              // Metal: specular reflection with slight roughness
+              let reflectDir = reflect(currentRay.direction, hit.normal);
+              // Add slight fuzziness for rough metal
+              let roughness = 0.1;
+              newDir = normalize(reflectDir + randomOnSphere(currentSeed) * roughness);
+              currentSeed = hash(currentSeed + 1u);
+              newThroughput = albedo;
+            } else if (isGlass) {
+              // Glass: refraction with Fresnel
+              let ior = 1.5; // Index of refraction for glass
+              var cosI = -dot(currentRay.direction, hit.normal);
+              var n1 = 1.0; // Air
+              var n2 = ior;
+              var normal = hit.normal;
+              
+              // Check if we're inside the sphere
+              if (cosI < 0.0) {
+                cosI = -cosI;
+                normal = -normal;
+                n1 = ior;
+                n2 = 1.0;
+              }
+              
+              let eta = n1 / n2;
+              let sinT2 = eta * eta * (1.0 - cosI * cosI);
+              
+              // Fresnel reflection coefficient
+              var r0 = (n1 - n2) / (n1 + n2);
+              r0 = r0 * r0;
+              let fresnel = r0 + (1.0 - r0) * pow(1.0 - cosI, 5.0);
+              
+              // Choose reflection or refraction based on Fresnel
+              if (sinT2 > 1.0 || random(currentSeed) < fresnel) {
+                // Total internal reflection or Fresnel reflection
+                newDir = reflect(currentRay.direction, hit.normal);
+                newThroughput = albedo;
+              } else {
+                // Refraction
+                let cosT = sqrt(1.0 - sinT2);
+                newDir = normalize(eta * currentRay.direction + (eta * cosI - cosT) * normal);
+                newThroughput = albedo * (1.0 - fresnel);
+              }
+              currentSeed = hash(currentSeed + 1u);
+            } else {
+              // Diffuse: cosine-weighted hemisphere sampling
+              newDir = normalize(hit.normal + randomOnSphere(currentSeed));
+              currentSeed = hash(currentSeed + 1u);
+              newThroughput = albedo * max(0.0, dot(newDir, hit.normal));
+            }
+            
+            throughput *= newThroughput;
             currentRay = Ray(hitPoint + hit.normal * 0.01, newDir);
           }
 
