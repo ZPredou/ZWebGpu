@@ -54,6 +54,22 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/demos/instanced-rendering/instanced-rendering.component').then(m => m.InstancedRenderingComponent)
   },
   {
+    path: 'demos/path-tracing',
+    loadComponent: () => import('./pages/demos/path-tracing/path-tracing.component').then(m => m.PathTracingComponent)
+  },
+  {
+    path: 'demos/volumetric-rendering',
+    loadComponent: () => import('./pages/demos/volumetric-rendering/volumetric-rendering.component').then(m => m.VolumetricRenderingComponent)
+  },
+  {
+    path: 'demos/fluid-simulation',
+    loadComponent: () => import('./pages/demos/fluid-simulation/fluid-simulation.component').then(m => m.FluidSimulationComponent)
+  },
+  {
+    path: 'demos/rigid-body-physics',
+    loadComponent: () => import('./pages/demos/rigid-body-physics/rigid-body-physics.component').then(m => m.RigidBodyPhysicsComponent)
+  },
+  {
     path: '**',
     redirectTo: ''
   }

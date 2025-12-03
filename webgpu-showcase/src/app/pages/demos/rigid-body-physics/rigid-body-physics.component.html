@@ -1,0 +1,73 @@
+<div class="demo-page">
+  <div class="demo-page__header">
+    <h1><span class="icon">⚙️</span> Rigid Body Physics</h1>
+  </div>
+  
+  <div class="demo-page__content">
+    <div class="demo-page__canvas-area">
+      <app-demo-base 
+        #demoBase
+        (contextReady)="onContextReady($event)"
+      ></app-demo-base>
+    </div>
+    
+    <div class="demo-page__controls">
+      <p class="demo-page__description">
+        GPU-accelerated rigid body physics simulation with collision detection and response. 
+        Features gravity, restitution, and friction.
+      </p>
+      
+      <h3>Physics</h3>
+      
+      <div class="control-group">
+        <label>Body Count: {{ bodyCount }}</label>
+        <input 
+          type="range" 
+          min="10" 
+          max="500" 
+          step="10" 
+          [(ngModel)]="bodyCount"
+          (change)="onBodyCountChange()"
+        >
+      </div>
+
+      <div class="control-group">
+        <label>Gravity: {{ gravity.toFixed(2) }}</label>
+        <input 
+          type="range" 
+          min="0.0" 
+          max="20.0" 
+          step="0.5" 
+          [(ngModel)]="gravity"
+        >
+      </div>
+
+      <div class="control-group">
+        <label>Restitution (Bounciness): {{ restitution.toFixed(2) }}</label>
+        <input 
+          type="range" 
+          min="0.0" 
+          max="1.0" 
+          step="0.05" 
+          [(ngModel)]="restitution"
+        >
+      </div>
+
+      <div class="control-group">
+        <label>Friction: {{ friction.toFixed(2) }}</label>
+        <input 
+          type="range" 
+          min="0.0" 
+          max="1.0" 
+          step="0.05" 
+          [(ngModel)]="friction"
+        >
+      </div>
+
+      <button class="btn btn--primary" (click)="resetSimulation()">
+        Reset
+      </button>
+    </div>
+  </div>
+</div>
+

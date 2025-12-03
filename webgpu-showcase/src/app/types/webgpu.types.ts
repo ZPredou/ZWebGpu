@@ -59,6 +59,24 @@ export const DEMOS: DemoInfo[] = [
     difficulty: 'medium',
     route: '/demos/procedural-graphics'
   },
+  {
+    id: 'path-tracing',
+    title: 'Path Tracing',
+    description: 'Real-time path tracing with global illumination, reflections, and refractions.',
+    icon: '✨',
+    category: 'graphics',
+    difficulty: 'advanced',
+    route: '/demos/path-tracing'
+  },
+  {
+    id: 'volumetric-rendering',
+    title: 'Volumetric Rendering',
+    description: 'Real-time volumetric cloud rendering with dynamic lighting and shadows.',
+    icon: '☁️',
+    category: 'graphics',
+    difficulty: 'advanced',
+    route: '/demos/volumetric-rendering'
+  },
   
   // Compute Shaders
   {
@@ -87,6 +105,24 @@ export const DEMOS: DemoInfo[] = [
     category: 'compute',
     difficulty: 'medium',
     route: '/demos/image-filters'
+  },
+  {
+    id: 'fluid-simulation',
+    title: 'Fluid Simulation',
+    description: 'Real-time fluid dynamics with advection, viscosity, and pressure simulation.',
+    icon: '🌊',
+    category: 'compute',
+    difficulty: 'advanced',
+    route: '/demos/fluid-simulation'
+  },
+  {
+    id: 'rigid-body-physics',
+    title: 'Rigid Body Physics',
+    description: 'GPU-accelerated rigid body physics with collision detection and response.',
+    icon: '⚙️',
+    category: 'compute',
+    difficulty: 'advanced',
+    route: '/demos/rigid-body-physics'
   },
   
   // Machine Learning

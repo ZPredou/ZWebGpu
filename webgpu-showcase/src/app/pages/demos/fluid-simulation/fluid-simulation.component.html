@@ -1,0 +1,80 @@
+<div class="demo-page">
+  <div class="demo-page__header">
+    <h1><span class="icon">🌊</span> Fluid Simulation</h1>
+  </div>
+  
+  <div class="demo-page__content">
+    <div class="demo-page__canvas-area">
+      <app-demo-base 
+        #demoBase
+        (contextReady)="onContextReady($event)"
+      ></app-demo-base>
+    </div>
+    
+    <div class="demo-page__controls">
+      <p class="demo-page__description">
+        Real-time fluid dynamics simulation using GPU compute shaders. 
+        Features advection, viscosity, and pressure simulation.
+      </p>
+      
+      <h3>Simulation</h3>
+      
+      <div class="control-group">
+        <label>Grid Size: {{ gridSize }}</label>
+        <input 
+          type="range" 
+          min="64" 
+          max="256" 
+          step="32" 
+          [(ngModel)]="gridSize"
+          (change)="onGridSizeChange()"
+        >
+      </div>
+
+      <div class="control-group">
+        <label>Viscosity: {{ viscosity.toFixed(3) }}</label>
+        <input 
+          type="range" 
+          min="0.0" 
+          max="0.1" 
+          step="0.001" 
+          [(ngModel)]="viscosity"
+        >
+      </div>
+
+      <div class="control-group">
+        <label>Force: {{ force.toFixed(2) }}</label>
+        <input 
+          type="range" 
+          min="1.0" 
+          max="20.0" 
+          step="0.5" 
+          [(ngModel)]="force"
+        >
+      </div>
+
+      <div class="control-group">
+        <label>Color Intensity: {{ colorIntensity.toFixed(2) }}</label>
+        <input 
+          type="range" 
+          min="0.5" 
+          max="3.0" 
+          step="0.1" 
+          [(ngModel)]="colorIntensity"
+        >
+      </div>
+
+      <div class="control-group">
+        <label>
+          <input type="checkbox" [(ngModel)]="showVelocity">
+          Show Velocity Field
+        </label>
+      </div>
+
+      <button class="btn btn--primary" (click)="resetSimulation()">
+        Reset
+      </button>
+    </div>
+  </div>
+</div>
+
