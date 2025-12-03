@@ -399,7 +399,7 @@ export class RayMarchingComponent implements AfterViewInit {
       device.queue.submit([commandEncoder.finish()]);
     };
 
-    (this.demoBase as any).startRenderLoop(render);
+    this.demoBase.startRenderLoop(render);
   }
 }
 

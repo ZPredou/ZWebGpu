@@ -212,8 +212,8 @@ export class NeuralNetworkComponent implements AfterViewInit {
           // Network prediction
           let prediction = forward(p);
           
-          // Target value
-          let target = getTarget(p);
+          // Expected value
+          let expected = getTarget(p);
           
           // Visualize prediction as color
           let predColor = vec3f(
@@ -230,9 +230,9 @@ export class NeuralNetworkComponent implements AfterViewInit {
           
           var color = mix(bgColor, predColor, prediction);
           
-          // Add target boundary
-          let targetGrad = fwidth(target) * 50.0;
-          if (abs(target - 0.5) < targetGrad) {
+          // Add expected boundary
+          let expectedGrad = fwidth(expected) * 50.0;
+          if (abs(expected - 0.5) < expectedGrad) {
             color = mix(color, vec3f(1.0, 1.0, 1.0), 0.5);
           }
           
@@ -389,7 +389,7 @@ export class NeuralNetworkComponent implements AfterViewInit {
       device.queue.submit([commandEncoder.finish()]);
     };
 
-    (this.demoBase as any).startRenderLoop(render);
+    this.demoBase.startRenderLoop(render);
   }
 }
 

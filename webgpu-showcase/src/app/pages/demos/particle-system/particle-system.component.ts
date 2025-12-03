@@ -333,6 +333,6 @@ export class ParticleSystemComponent implements AfterViewInit {
       this.step++;
     };
 
-    (this.demoBase as any).startRenderLoop(render);
+    this.demoBase.startRenderLoop(render);
   }
 }

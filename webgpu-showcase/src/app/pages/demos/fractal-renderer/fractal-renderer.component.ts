@@ -43,6 +43,10 @@ export class FractalRendererComponent implements AfterViewInit {
 
   onFractalChange(): void {
     this.resetView();
+    // Recreate pipeline with new fractal shader code
+    if (this.context) {
+      this.initializePipeline();
+    }
   }
 
   resetView(): void {
@@ -278,7 +282,7 @@ export class FractalRendererComponent implements AfterViewInit {
       device.queue.submit([commandEncoder.finish()]);
     };
 
-    (this.demoBase as any).startRenderLoop(render);
+    this.demoBase.startRenderLoop(render);
   }
 }
 

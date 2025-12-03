@@ -10,10 +10,6 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/demos/hello-triangle/hello-triangle.component').then(m => m.HelloTriangleComponent)
   },
   {
-    path: 'demos/rotating-cube',
-    loadComponent: () => import('./pages/demos/rotating-cube/rotating-cube.component').then(m => m.RotatingCubeComponent)
-  },
-  {
     path: 'demos/shader-playground',
     loadComponent: () => import('./pages/demos/shader-playground/shader-playground.component').then(m => m.ShaderPlaygroundComponent)
   },
@@ -32,10 +28,6 @@ export const routes: Routes = [
   {
     path: 'demos/image-filters',
     loadComponent: () => import('./pages/demos/image-filters/image-filters.component').then(m => m.ImageFiltersComponent)
-  },
-  {
-    path: 'demos/physics-simulation',
-    loadComponent: () => import('./pages/demos/physics-simulation/physics-simulation.component').then(m => m.PhysicsSimulationComponent)
   },
   {
     path: 'demos/matrix-multiplication',

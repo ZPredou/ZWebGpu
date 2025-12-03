@@ -85,7 +85,7 @@ export class DemoBaseComponent implements AfterViewInit, OnDestroy {
     canvas.style.height = `${rect.height}px`;
   }
 
-  protected startRenderLoop(renderFn: (time: number, deltaTime: number) => void): void {
+  startRenderLoop(renderFn: (time: number, deltaTime: number) => void): void {
     // Run the render loop outside Angular's zone to prevent unnecessary change detection
     this.ngZone.runOutsideAngular(() => {
       const loop = (time: number) => {
@@ -108,7 +108,7 @@ export class DemoBaseComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  protected stopRenderLoop(): void {
+  stopRenderLoop(): void {
     if (this.animationFrameId !== null) {
       cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;

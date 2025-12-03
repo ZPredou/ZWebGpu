@@ -26,6 +26,7 @@ export class DataVisualizationComponent implements AfterViewInit {
   private uniformBuffer: GPUBuffer | null = null;
   private bindGroup: GPUBindGroup | null = null;
   private context: WebGPUContext | null = null;
+  private bufferPointCount = 0; // Track actual buffer size
 
   ngAfterViewInit(): void {}
 
@@ -108,6 +109,7 @@ export class DataVisualizationComponent implements AfterViewInit {
       usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST,
     });
     device.queue.writeBuffer(this.dataBuffer, 0, data);
+    this.bufferPointCount = this.pointCount; // Update actual buffer size
   }
 
   private gaussianRandom(): number {
@@ -175,7 +177,7 @@ export class DataVisualizationComponent implements AfterViewInit {
           
           // Scale quad by point size
           let size = uniforms.pointSize * 0.005;
-          let scaledQuad = input.quadPos * size;
+          var scaledQuad = input.quadPos * size;
           scaledQuad.x /= uniforms.aspectRatio;
           
           output.position = vec4f(animatedPos + scaledQuad, 0.0, 1.0);
@@ -288,13 +290,13 @@ export class DataVisualizationComponent implements AfterViewInit {
       renderPass.setBindGroup(0, this.bindGroup!);
       renderPass.setVertexBuffer(0, this.vertexBuffer!);
       renderPass.setVertexBuffer(1, this.dataBuffer);
-      renderPass.draw(6, this.pointCount);
+      renderPass.draw(6, this.bufferPointCount); // Use actual buffer size
       renderPass.end();
 
       device.queue.submit([commandEncoder.finish()]);
     };
 
-    (this.demoBase as any).startRenderLoop(render);
+    this.demoBase.startRenderLoop(render);
   }
 }
 

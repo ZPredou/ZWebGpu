@@ -334,10 +334,10 @@ export class InstancedRenderingComponent implements AfterViewInit {
       const aspect = canvas.width / canvas.height;
 
       // Camera orbiting
-      const camDist = this.spread * 1.5;
+      const camDist = this.spread * 2.0;
       const camPos = [
         Math.sin(t * 0.2) * camDist,
-        Math.sin(t * 0.1) * camDist * 0.3 + 2,
+        Math.sin(t * 0.1) * camDist * 0.5 + 3,
         Math.cos(t * 0.2) * camDist
       ];
 
@@ -379,7 +379,7 @@ export class InstancedRenderingComponent implements AfterViewInit {
       device.queue.submit([commandEncoder.finish()]);
     };
 
-    (this.demoBase as any).startRenderLoop(render);
+    this.demoBase.startRenderLoop(render);
   }
 
   private createViewProjection(eye: number[], aspect: number): number[] {

@@ -42,15 +42,6 @@ export const DEMOS: DemoInfo[] = [
     route: '/demos/hello-triangle'
   },
   {
-    id: 'rotating-cube',
-    title: 'Rotating 3D Cube',
-    description: '3D cube with perspective projection, depth buffering, and smooth rotation.',
-    icon: '📦',
-    category: 'graphics',
-    difficulty: 'easy',
-    route: '/demos/rotating-cube'
-  },
-  {
     id: 'shader-playground',
     title: 'Shader Playground',
     description: 'Interactive fragment shader editor with real-time preview.',
@@ -96,15 +87,6 @@ export const DEMOS: DemoInfo[] = [
     category: 'compute',
     difficulty: 'medium',
     route: '/demos/image-filters'
-  },
-  {
-    id: 'physics-simulation',
-    title: 'Physics Simulation',
-    description: 'Cloth or fluid simulation using GPU compute.',
-    icon: '🌊',
-    category: 'compute',
-    difficulty: 'advanced',
-    route: '/demos/physics-simulation'
   },
   
   // Machine Learning
